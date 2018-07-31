@@ -82,7 +82,7 @@ namespace MicroLibrary
         public bool Enabled
         {
             set
-            {x
+            {
                 if (value)
                 {
                     Start();
