@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace MicroLibrary
 {
@@ -41,7 +42,7 @@ namespace MicroLibrary
                              MicroTimerEventArgs timerEventArgs);
         public event MicroTimerElapsedEventHandler MicroTimerElapsed;
 
-        System.Threading.Thread _threadTimer = null;
+        Thread _threadTimer = null;
         long _ignoreEventIfLateBy = long.MaxValue;
         long _timerIntervalInMicroSec = 0;
         bool _stopTimer = true;
@@ -60,33 +61,28 @@ namespace MicroLibrary
         }
         #endregion
 
-        public long Interval { get =>  System.Threading.Interlocked.Read(
-                    ref _timerIntervalInMicroSec);
+        public long Interval { get => Interlocked.Read(ref _timerIntervalInMicroSec);
             set 
             {
-                System.Threading.Interlocked.Exchange(
-                    ref _timerIntervalInMicroSec, value);
+                Interlocked.Exchange(ref _timerIntervalInMicroSec, value);
             }
         }
 
         public long IgnoreEventIfLateBy
         {
-            get
-            {
-                return System.Threading.Interlocked.Read(
-                    ref _ignoreEventIfLateBy);
-            }
+            get => Interlocked.Read(ref _ignoreEventIfLateBy);
+            
             set
             {
-                System.Threading.Interlocked.Exchange(
-                    ref _ignoreEventIfLateBy, value <= 0 ? long.MaxValue : value);
+                Interlocked.Exchange(ref _ignoreEventIfLateBy,
+                                     value <= 0 ? long.MaxValue : value);
             }
         }
 
         public bool Enabled
         {
             set
-            {
+            {x
                 if (value)
                 {
                     Start();
@@ -111,15 +107,15 @@ namespace MicroLibrary
 
             _stopTimer = false;
 
-            System.Threading.ThreadStart threadStart = delegate()
+            ThreadStart threadStart = delegate()
             {
                 NotificationTimer(ref _timerIntervalInMicroSec,
                                   ref _ignoreEventIfLateBy,
                                   ref _stopTimer);
             };
 
-            _threadTimer = new System.Threading.Thread(threadStart);
-            _threadTimer.Priority = System.Threading.ThreadPriority.Highest;
+            _threadTimer = new Thread(threadStart);
+            _threadTimer.Priority = ThreadPriority.Highest;
             _threadTimer.Start();
         }
 
@@ -130,15 +126,14 @@ namespace MicroLibrary
 
         public void StopAndWait()
         {
-            StopAndWait(System.Threading.Timeout.Infinite);
+            StopAndWait(Timeout.Infinite);
         }
 
         public bool StopAndWait(int timeoutInMilliSec)
         {
             _stopTimer = true;
 
-            if (!Enabled || _threadTimer.ManagedThreadId ==
-                System.Threading.Thread.CurrentThread.ManagedThreadId)
+            if (!Enabled || _threadTimer.ManagedThreadId ==Thread.CurrentThread.ManagedThreadId)
             {
                 return true;
             }
@@ -172,9 +167,9 @@ namespace MicroLibrary
                     microStopwatch.ElapsedMicroseconds - nextNotification;
 
                 long timerIntervalInMicroSecCurrent =
-                    System.Threading.Interlocked.Read(ref timerIntervalInMicroSec);
+                    Interlocked.Read(ref timerIntervalInMicroSec);
                 long ignoreEventIfLateByCurrent =
-                    System.Threading.Interlocked.Read(ref ignoreEventIfLateBy);
+                    Interlocked.Read(ref ignoreEventIfLateBy);
 
                 nextNotification += timerIntervalInMicroSecCurrent;
                 timerCount++;
@@ -183,7 +178,7 @@ namespace MicroLibrary
                 while ( (elapsedMicroseconds = microStopwatch.ElapsedMicroseconds)
                         < nextNotification)
                 {
-                    System.Threading.Thread.SpinWait(10);
+                    Thread.SpinWait(10);
                 }
 
                 long timerLateBy = elapsedMicroseconds - nextNotification;
