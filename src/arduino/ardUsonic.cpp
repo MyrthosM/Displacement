@@ -14,7 +14,7 @@ long ardUsonic::Timing()
     digitalWrite(Trig_pin, LOW);
     delayMicroseconds(2);
     digitalWrite(Trig_pin,HIGH);
-    delayMicroseconds(10);
+    delayMicroseconds(4);
     digitalWrite(Trig_pin,LOW);
     duration = pulseIn(Echo_pin, HIGH);
     return duration;
