@@ -14,19 +14,45 @@ long ardUsonic::Timing()
     digitalWrite(Trig_pin, LOW);
     delayMicroseconds(2);
     digitalWrite(Trig_pin,HIGH);
-    delayMicroseconds(4);
+    delayMicroseconds(10);
     digitalWrite(Trig_pin,LOW);
     duration = pulseIn(Echo_pin, HIGH);
     return duration;
 }
 
-long ardUsonic::Ranging(int sys)
+float ardUsonic::Ranging(int sys)
 {
     Timing();
-    distance_cm = duration /29 / 2 ;
+    distance_cm = ((float)duration / 58) * 10.0 ;
     distance_inc = duration / 74 / 2;
-    if (sys)
-    return distance_cm;
+    if (sys == 1) 
+    {
+        return distance_cm;
+    }
+    else if(sys == 2)
+    {
+        return distance_mm = (duration / 2) * 0.00034402;
+    }
     else
     return distance_inc;
+}
+
+long ardUsonic::TestDistance()
+{
+    Timing();
+    test_distance = (duration * 340)/2;
+    return test_distance;
+}
+
+float ardUsonic::microsecondsToMillimeters(long microseconds, int temperature) {
+
+ //The above calculations do not take temperature into account.
+ //A 10F difference causes a 4.64 m/s difference in sound velocity.
+ //long metersPerSecond = 331.5 + (0.6 * (temperature - 32)/1.8);
+ long metersPerSecond = 344.02;
+ //long metersPerSecond = 320.8334 + (0.333 * temperature);
+ //float millimetersPerSecond = metersPerSecond * 1000.0000;
+ //float millimetersPerMicroSecond = millimetersPerSecond / 1000000.00000;
+ float millimeters = (metersPerSecond * microseconds)/58;
+ return millimeters;
 }
