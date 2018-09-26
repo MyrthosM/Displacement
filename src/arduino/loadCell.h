@@ -76,6 +76,9 @@ class loadCell
 
 		// wakes up the chip after power down mode
 		void power_up();
+
+		// Arduino setup script
+		void setupArd();
 };
 
 #endif /* loadCell_h */

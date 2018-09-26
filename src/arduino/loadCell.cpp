@@ -136,3 +136,30 @@ void loadCell::power_down() {
 void loadCell::power_up() {
 	digitalWrite(PD_SCK, LOW);
 }
+
+void loadCell::setupArd(){
+	Serial.begin(115200);
+  delay(1000);
+  Serial.println("Setting scale!");
+  delay(500);
+  mirusLoadCell.set_scale();
+  Serial.println("Taring scale!");
+  delay(500);
+  mirusLoadCell.tare();
+  Serial.println("Tared!");
+  Serial.println("Timeout for get_units Function:");
+    for(int i = 0; i < 6; i++){
+      Serial.println("Starting the timer..");
+      delay(1000);  
+      Serial.print(i);
+      Serial.println("...");
+    }
+  mirusLoadCell.get_units(10);
+  Serial.println("Timeout before main loop");
+    for(int i = 0; i < 6; i++){
+      Serial.println("Starting the timer..");
+      delay(1000);  
+      Serial.print(i);
+      Serial.println("...");
+    }
+}
