@@ -64,9 +64,9 @@ long loadCell::read() {
 	uint8_t filler = 0x00;
 
 	// pulse the clock pin 24 times to read the data
-	data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
-	data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
 	data[2] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+	data[1] = shiftIn(DOUT, PD_SCK, MSBFIRST);
+	data[0] = shiftIn(DOUT, PD_SCK, MSBFIRST);
 
 	// set the channel and the gain factor for the next reading using the clock pin
 	for (unsigned int i = 0; i < GAIN; i++) {
@@ -75,7 +75,7 @@ long loadCell::read() {
 	}
 
 	// Replicate the most significant bit to pad out a 32-bit signed integer
-	if (data[0] & 0x80) {
+	if (data[2] & 0x80) {
 		filler = 0xFF;
 	} else {
 		filler = 0x00;
@@ -83,9 +83,9 @@ long loadCell::read() {
 
 	// Construct a 32-bit signed integer
 	value = ( static_cast<unsigned long>(filler) << 24
-			| static_cast<unsigned long>(data[0]) << 16
+			| static_cast<unsigned long>(data[2]) << 16
 			| static_cast<unsigned long>(data[1]) << 8
-			| static_cast<unsigned long>(data[2]) );
+			| static_cast<unsigned long>(data[0]) );
 
 	return static_cast<long>(value);
 }
