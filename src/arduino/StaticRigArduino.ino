@@ -10,7 +10,8 @@ float getUnitsResult = 0.6;
 float getUnitsResultSingle = 0.6;
     
 void setup()
-{Serial.begin(38400);
+{ 
+  Serial.begin(38400);
   Serial.println("HX711 Demo");
 
   Serial.println("Initializing the scale");

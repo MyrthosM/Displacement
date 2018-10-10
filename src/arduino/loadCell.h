@@ -19,6 +19,8 @@ class loadCell
 		byte GAIN;		// amplification factor
 		long OFFSET = 0;	// used for tare weight
 		float SCALE = 1;	// used to return weight in grams, kg, ounces, whatever
+		float LOADCELL_KOEFICIENT; // Load cell capacity / sensitivity
+		float CODE_DIVIDER_RANGE; // Gain / 2N for the ADC output range
 
 	public:
 		// define clock and data pin, channel, and gain factor
@@ -51,6 +53,10 @@ class loadCell
 
 		// returns (read_average() - OFFSET), that is the current value without the tare weight; times = how many readings to do
 		double get_value(byte times = 1);
+
+		// Returns get value converted to KG ouput 
+		// times = how many reading to do 
+		float get_unitsKG(byte times);
 
 		// returns get_value() divided by SCALE, that is the raw value divided by a value obtained via calibration
 		// times = how many readings to do

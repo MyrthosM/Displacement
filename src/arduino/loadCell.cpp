@@ -13,6 +13,8 @@
 
 loadCell::loadCell(byte dout, byte pd_sck, byte gain) {
 	begin(dout, pd_sck, gain);
+	LOADCELL_KOEFICIENT = 60000 / 9.5;
+	CODE_DIVIDER_RANGE = gain * 16777216;
 }
 
 loadCell::loadCell() {
@@ -101,6 +103,14 @@ long loadCell::read_average(byte times) {
 
 double loadCell::get_value(byte times) {
 	return read_average(times) - OFFSET;
+}
+
+float loadCell::get_unitsKG(byte times) {
+
+	long dataOUT = get_value(times);
+	float value = (dataOUT / CODE_DIVIDER_RANGE)*LOADCELL_KOEFICIENT;
+
+	return value;
 }
 
 float loadCell::get_units(byte times) {
